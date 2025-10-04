@@ -20,7 +20,13 @@ public class JasperReportService {
     public static final String ARQUIVOJRXML = "cert.jrxml";
     public static final Logger LOGGER = LoggerFactory.getLogger(JasperReportService.class);
 
-    public static final String DESTINOPDF = "jasper-report";
+    // INÍCIO DA MODIFICAÇÃO
+    // 1. Obtém o diretório Home do usuário
+    public static final String HOME_DIR = System.getProperty("user.home");
+
+    // 2. Define o caminho completo: /home/usuario/jasper-report
+    public static final String DESTINOPDF = HOME_DIR + File.separator + "jasper-report";
+    // FIM DA MODIFICAÇÃO
 
 
     public void gerar(Aluno aluno) throws IOException {
@@ -37,12 +43,16 @@ public class JasperReportService {
 
         String pathAbsoluto = getAbsultePath();
         try{
-            String folderDiretorio = getDiretorioSave("certificados-salvos");
+            // Gera um nome de arquivo único
+            String nomeArquivo = "certificado-" + aluno.getNome().replaceAll("\\s+", "_") + ".pdf";
+            String folderDiretorio = getDiretorioSave(nomeArquivo);
+
             JasperReport report = JasperCompileManager.compileReport(pathAbsoluto);
             LOGGER.info("report compilado: {} ", pathAbsoluto);
             JasperPrint print = JasperFillManager.fillReport(report, params, new JREmptyDataSource());
             LOGGER.info("jasper print");
             JasperExportManager.exportReportToPdfFile(print, folderDiretorio);
+            // O log agora mostrará o caminho completo, ex: /home/usuario/jasper-report/certificado-Nome.pdf
             LOGGER.info("PDF EXPORTADO PARA: {}", folderDiretorio);
 
         } catch (JRException e) {
@@ -60,15 +70,16 @@ public class JasperReportService {
     }
 
     private String getDiretorioSave(String name) {
-        this.createDiretorio(DESTINOPDF);
-        // Adiciona File.separator (barra de diretório) para salvar DENTRO da pasta
-        return DESTINOPDF + File.separator + name.concat(".pdf");
+        this.createDiretorio(); // Chama o método para criar o diretório base
+        return DESTINOPDF + File.separator + name;
     }
 
-    private void createDiretorio(String name) {
-        File dir = new File(name);
+    // MÉTODO createDiretorio ATUALIZADO
+    private void createDiretorio() {
+        File dir = new File(DESTINOPDF); // Usa o caminho completo do Home Dir
         if(!dir.exists()){
-            dir.mkdir();
+            // Usa mkdirs() para garantir que todos os diretórios no caminho sejam criados
+            dir.mkdirs();
         }
     }
 
