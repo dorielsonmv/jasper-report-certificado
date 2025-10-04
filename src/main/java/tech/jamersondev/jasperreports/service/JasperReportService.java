@@ -20,7 +20,7 @@ public class JasperReportService {
     public static final String ARQUIVOJRXML = "cert.jrxml";
     public static final Logger LOGGER = LoggerFactory.getLogger(JasperReportService.class);
 
-    public static final String DESTINOPDF = "C:\\jasper-report\\";
+    public static final String DESTINOPDF = "jasper-report";
 
 
     public void gerar(Aluno aluno) throws IOException {
@@ -61,7 +61,8 @@ public class JasperReportService {
 
     private String getDiretorioSave(String name) {
         this.createDiretorio(DESTINOPDF);
-        return DESTINOPDF+name.concat(".pdf");
+        // Adiciona File.separator (barra de diretório) para salvar DENTRO da pasta
+        return DESTINOPDF + File.separator + name.concat(".pdf");
     }
 
     private void createDiretorio(String name) {
